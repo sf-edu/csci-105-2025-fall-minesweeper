@@ -59,6 +59,66 @@ class Space
     public SpaceState State = SpaceState.Hidden;
     public bool IsBomb = false;
     public int Neighbors = 0;
+
+    public const char EMPTY_TOKEN = ' ';
+
+    public const char HIDDEN_TOKEN = ' ';
+    public const ConsoleColor HIDDEN_BG = ConsoleColor.Green;
+
+    public const char BOMB_TOKEN = '@';
+    public const ConsoleColor BOMB_FG = ConsoleColor.Red;
+
+    public const char FLAG_TOKEN = 'X';
+    public const ConsoleColor FLAG_FG = ConsoleColor.Blue;
+
+    public readonly Dictionary<int, ConsoleColor> NEIGHBOR_COLORS = new()
+    {
+        { 1, ConsoleColor.Blue },
+        { 2, ConsoleColor.Green },
+        { 3, ConsoleColor.Red },
+        { 4, ConsoleColor.Magenta },
+        { 5, ConsoleColor.Yellow },
+        { 6, ConsoleColor.Cyan },
+        { 7, ConsoleColor.DarkYellow },
+        { 8, ConsoleColor.DarkGreen },
+    };
+
+    /// SAFETY: Assumes the cursor is at the correct location on-screen.
+    public void Render()
+    {
+        switch (State)
+        {
+            case SpaceState.Hidden:
+                Console.BackgroundColor = HIDDEN_BG;
+                Console.Write(HIDDEN_TOKEN);
+                break;
+
+            case SpaceState.Revealed:
+                if (IsBomb)
+                {
+                    Console.ForegroundColor = BOMB_FG;
+                    Console.Write(BOMB_TOKEN);
+                    break;
+                }
+                else if (Neighbors <= 0)
+                {
+                    Console.Write(EMPTY_TOKEN);
+                }
+                else
+                {
+                    Console.ForegroundColor = NEIGHBOR_COLORS[Neighbors];
+                    Console.Write(Neighbors);
+                }
+                break;
+
+            case SpaceState.Flagged:
+                Console.ForegroundColor = FLAG_FG;
+                Console.Write(FLAG_TOKEN);
+                break;
+        }
+
+        Console.ResetColor();
+    }
 }
 
 enum SpaceState
