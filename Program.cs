@@ -1,5 +1,7 @@
 var board = new Board(30, 20);
 board.PlaceBombs(99);
+Console.Clear();
+board.Render();
 
 class Board
 {
@@ -50,9 +52,22 @@ class Board
             }
         }
     }
+
+    public void Render()
+    {
+        Console.SetCursorPosition(0, 0);
+
+        for (var y = 0; y < Height; y++)
+        {
+            for (var x = 0; x < Width; x++)
+            {
+                GetSpace(x, y).Render();
+            }
+
+            Console.WriteLine();
+        }
     }
 }
-
 
 class Space
 {
