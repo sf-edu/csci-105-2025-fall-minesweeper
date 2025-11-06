@@ -11,3 +11,17 @@ class Board
     }
 }
 
+
+class Space
+{
+    public SpaceState State = SpaceState.Hidden;
+    public bool IsBomb = false;
+    public int Neighbors = 0;
+}
+
+enum SpaceState
+{
+    Hidden,
+    Revealed,
+    Flagged,
+}
