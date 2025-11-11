@@ -1,5 +1,7 @@
 var board = new Board(30, 20);
 board.PlaceBombs(99);
+board.CountNeighbors();
+
 Console.Clear();
 board.Render();
 
@@ -53,6 +55,34 @@ class Board
         }
     }
 
+    /// <summary>
+    /// Label all non-bomb spaces with the number of bombs it is adjacent to.
+    /// This includes diagonals.
+    /// </summary>
+    public void CountNeighbors()
+    {
+        for (var y = 0; y < Height; y++)
+        {
+            for (var x = 0; x < Width; x++)
+            {
+                var top = Math.Max(y - 1, 0);
+                var left = Math.Max(x - 1, 0);
+                var right = Math.Min(x + 1, Width - 1);
+                var bottom = Math.Min(y + 1, Height - 1);
+
+                for (var y1 = top; y1 <= bottom; y1++)
+                {
+                    for (var x1 = left; x1 <= right; x1++)
+                    {
+                        if (GetSpace(x1, y1).IsBomb)
+                        {
+                            GetSpace(x, y).Neighbors++;
+                        }
+                    }
+                }
+            }
+        }
+    }
     public void Render()
     {
         Console.SetCursorPosition(0, 0);
