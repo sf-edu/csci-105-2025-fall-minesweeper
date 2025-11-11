@@ -1,12 +1,12 @@
 var board = new Board(30, 20);
-board.PlaceBombs(99);
-board.CountNeighbors();
 
 Console.Clear();
 Console.CursorVisible = false;
 
 int x = board.Width / 2;
 int y = board.Height / 2;
+
+var bombsPlaced = false;
 
 while (true)
 {
@@ -45,6 +45,12 @@ while (true)
             break;
 
         case ConsoleKey.Spacebar:
+            if (!bombsPlaced)
+            {
+                board.PlaceBombs(99, x, y);
+                board.CountNeighbors();
+                bombsPlaced = true;
+            }
             board.Reveal(x, y);
             break;
 
@@ -77,22 +83,32 @@ class Board
         return Spaces[x + y * Width];
     }
 
-    public void PlaceBombs(int count)
+    public void PlaceBombs(int count, int cursorX, int cursorY)
     {
         var random = new Random();
 
+        var top = Math.Max(cursorY - 1, 0);
+        var left = Math.Max(cursorX - 1, 0);
+        var right = Math.Min(cursorX + 1, Width - 1);
+        var bottom = Math.Min(cursorY + 1, Height - 1);
+
         for (var i = 0; i < count; i++)
         {
-            PlaceBomb(random);
+            PlaceBomb(random, top, left, right, bottom);
         }
     }
 
-    public void PlaceBomb(Random random)
+    public void PlaceBomb(Random random, int top, int left, int right, int bottom)
     {
         while (true)
         {
             var x = random.Next(Width);
             var y = random.Next(Height);
+
+            if (left <= x && x <= right && top <= y && y <= bottom)
+            {
+                continue;
+            }
 
             var space = GetSpace(x, y);
 
