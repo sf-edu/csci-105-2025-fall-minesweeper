@@ -47,6 +47,10 @@ while (true)
         case ConsoleKey.Spacebar:
             board.Reveal(x, y);
             break;
+
+        case ConsoleKey.F:
+            board.ToggleFlag(x, y);
+            break;
     }
 }
 
@@ -156,6 +160,23 @@ class Board
             }
         }
     }
+
+    public void ToggleFlag(int x, int y)
+    {
+        var space = GetSpace(x, y);
+
+        switch (space.State)
+        {
+            case SpaceState.Hidden:
+                space.State = SpaceState.Flagged;
+                break;
+
+            case SpaceState.Flagged:
+                space.State = SpaceState.Hidden;
+                break;
+        }
+    }
+
     public void Render()
     {
         Console.SetCursorPosition(0, 0);
