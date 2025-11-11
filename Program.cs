@@ -85,6 +85,7 @@ class Space
 
     public const char FLAG_TOKEN = 'X';
     public const ConsoleColor FLAG_FG = ConsoleColor.Blue;
+    public const ConsoleColor FLAG_BG = ConsoleColor.Green;
 
     public readonly Dictionary<int, ConsoleColor> NEIGHBOR_COLORS = new()
     {
@@ -128,10 +129,12 @@ class Space
 
             case SpaceState.Flagged:
                 Console.ForegroundColor = FLAG_FG;
+                Console.BackgroundColor = FLAG_BG;
                 Console.Write(FLAG_TOKEN);
                 break;
         }
 
+        Console.Write(" ");
         Console.ResetColor();
     }
 }
