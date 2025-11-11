@@ -3,7 +3,49 @@ board.PlaceBombs(99);
 board.CountNeighbors();
 
 Console.Clear();
-board.Render();
+Console.CursorVisible = false;
+
+int x = board.Width / 2;
+int y = board.Height / 2;
+
+while (true)
+{
+    board.Render();
+    Console.SetCursorPosition(x * 2, y);
+    Console.ForegroundColor = ConsoleColor.Black;
+    Console.BackgroundColor = ConsoleColor.Green;
+    Console.Write("X");
+    Console.ResetColor();
+
+    switch (Console.ReadKey(true).Key)
+    {
+        case ConsoleKey.Escape:
+            Console.Clear();
+            Console.CursorVisible = true;
+            return;
+
+        case ConsoleKey.W:
+        case ConsoleKey.UpArrow:
+            y = Math.Max(y - 1, 0);
+            break;
+
+        case ConsoleKey.A:
+        case ConsoleKey.LeftArrow:
+            x = Math.Max(x - 1, 0);
+            break;
+
+        case ConsoleKey.S:
+        case ConsoleKey.DownArrow:
+            y = Math.Min(y + 1, board.Height - 1);
+            break;
+
+        case ConsoleKey.D:
+        case ConsoleKey.RightArrow:
+            x = Math.Min(x + 1, board.Width - 1);
+            break;
+
+    }
+}
 
 class Board
 {
