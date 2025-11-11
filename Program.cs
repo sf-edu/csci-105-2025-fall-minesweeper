@@ -44,6 +44,9 @@ while (true)
             x = Math.Min(x + 1, board.Width - 1);
             break;
 
+        case ConsoleKey.Spacebar:
+            board.Reveal(x, y);
+            break;
     }
 }
 
@@ -122,6 +125,34 @@ class Board
                         }
                     }
                 }
+            }
+        }
+    }
+
+    public void Reveal(int x, int y, bool popFlags = false)
+    {
+        var space = GetSpace(x, y);
+        if (space.State == SpaceState.Revealed || space.State == SpaceState.Flagged && !popFlags)
+        {
+            return;
+        }
+
+        space.State = SpaceState.Revealed;
+        if (0 < space.Neighbors)
+        {
+            return;
+        }
+
+        var top = Math.Max(y - 1, 0);
+        var left = Math.Max(x - 1, 0);
+        var right = Math.Min(x + 1, Width - 1);
+        var bottom = Math.Min(y + 1, Height - 1);
+
+        for (var y1 = top; y1 <= bottom; y1++)
+        {
+            for (var x1 = left; x1 <= right; x1++)
+            {
+                Reveal(x1, y1, true);
             }
         }
     }
