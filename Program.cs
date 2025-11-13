@@ -25,26 +25,31 @@ while (true)
 
     switch (Console.ReadKey(true).Key)
     {
+        case ConsoleKey.Q:
         case ConsoleKey.Escape:
             Console.Clear();
             Console.CursorVisible = true;
             return;
 
+        case ConsoleKey.K:
         case ConsoleKey.W:
         case ConsoleKey.UpArrow:
             y = Math.Max(y - 1, 0);
             break;
 
+        case ConsoleKey.H:
         case ConsoleKey.A:
         case ConsoleKey.LeftArrow:
             x = Math.Max(x - 1, 0);
             break;
 
+        case ConsoleKey.J:
         case ConsoleKey.S:
         case ConsoleKey.DownArrow:
             y = Math.Min(y + 1, board.Height - 1);
             break;
 
+        case ConsoleKey.L:
         case ConsoleKey.D:
         case ConsoleKey.RightArrow:
             x = Math.Min(x + 1, board.Width - 1);
