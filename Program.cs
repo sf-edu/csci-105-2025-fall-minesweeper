@@ -1,5 +1,5 @@
-var board = new Board(12, 10);
-var bombCount = 20;
+var board = new Board(30, 20);
+var bombCount = 99;
 
 Console.Clear();
 Console.CursorVisible = false;
@@ -256,6 +256,10 @@ class Board
         var flagCount = Spaces.Count(s => s.State == SpaceState.Flagged);
 
         Console.WriteLine($"\nFlags remaining: {bombCount - flagCount}       ");
+
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine("\nwasd / hjkl / arrows, f to flag, space to reveal");
+        Console.ResetColor();
 
         switch (State)
         {
