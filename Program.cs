@@ -12,9 +12,8 @@ while (true)
 {
     board.Render();
     Console.SetCursorPosition(x * 2, y);
-    Console.ForegroundColor = ConsoleColor.Black;
-    Console.BackgroundColor = ConsoleColor.Green;
-    Console.Write("X");
+    Console.BackgroundColor = ConsoleColor.DarkYellow;
+    Console.Write(" ");
     Console.ResetColor();
 
     switch (Console.ReadKey(true).Key)
@@ -206,6 +205,11 @@ class Board
 
             Console.WriteLine();
         }
+
+        var bombCount = Spaces.Count(s => s.IsBomb);
+        var flagCount = Spaces.Count(s => s.State == SpaceState.Flagged);
+
+        Console.WriteLine($"\nFlags remaining: {bombCount - flagCount}");
     }
 }
 
@@ -217,15 +221,14 @@ class Space
 
     public const char EMPTY_TOKEN = ' ';
 
-    public const char HIDDEN_TOKEN = ' ';
-    public const ConsoleColor HIDDEN_BG = ConsoleColor.Green;
+    public const char HIDDEN_TOKEN = '.';
+    public const ConsoleColor HIDDEN_FG = ConsoleColor.Green;
 
     public const char BOMB_TOKEN = '@';
     public const ConsoleColor BOMB_FG = ConsoleColor.Red;
 
-    public const char FLAG_TOKEN = 'X';
-    public const ConsoleColor FLAG_FG = ConsoleColor.Blue;
-    public const ConsoleColor FLAG_BG = ConsoleColor.Green;
+    public const char FLAG_TOKEN = 'F';
+    public const ConsoleColor FLAG_FG = ConsoleColor.White;
 
     public readonly Dictionary<int, ConsoleColor> NEIGHBOR_COLORS = new()
     {
@@ -245,7 +248,7 @@ class Space
         switch (State)
         {
             case SpaceState.Hidden:
-                Console.BackgroundColor = HIDDEN_BG;
+                Console.ForegroundColor = HIDDEN_FG;
                 Console.Write(HIDDEN_TOKEN);
                 break;
 
@@ -269,7 +272,6 @@ class Space
 
             case SpaceState.Flagged:
                 Console.ForegroundColor = FLAG_FG;
-                Console.BackgroundColor = FLAG_BG;
                 Console.Write(FLAG_TOKEN);
                 break;
         }
