@@ -1,4 +1,5 @@
-var board = new Board(30, 20);
+var board = new Board(12, 10);
+var bombCount = 20;
 
 Console.Clear();
 Console.CursorVisible = false;
@@ -11,6 +12,12 @@ var bombsPlaced = false;
 while (true)
 {
     board.Render();
+
+    if (board.State != BoardState.InProgress)
+    {
+        break;
+    }
+
     Console.SetCursorPosition(x * 2, y);
     Console.BackgroundColor = ConsoleColor.DarkYellow;
     Console.Write(" ");
@@ -46,15 +53,17 @@ while (true)
         case ConsoleKey.Spacebar:
             if (!bombsPlaced)
             {
-                board.PlaceBombs(99, x, y);
+                board.PlaceBombs(bombCount, x, y);
                 board.CountNeighbors();
                 bombsPlaced = true;
             }
             board.Reveal(x, y);
+            board.CheckForVictory();
             break;
 
         case ConsoleKey.F:
             board.ToggleFlag(x, y);
+            board.CheckForVictory();
             break;
     }
 }
@@ -64,6 +73,8 @@ class Board
     public Space[] Spaces { get; set; }
     public int Height { get; set; }
     public int Width { get; set; }
+
+    public BoardState State { get; set; } = BoardState.InProgress;
 
     public Board(int width, int height)
     {
@@ -157,6 +168,18 @@ class Board
         }
 
         space.State = SpaceState.Revealed;
+
+        if (space.IsBomb)
+        {
+            foreach (var s in Spaces.Where(s => s.IsBomb))
+            {
+                s.State = SpaceState.Revealed;
+            }
+
+            State = BoardState.Defeat;
+            return;
+        }
+
         if (0 < space.Neighbors)
         {
             return;
@@ -192,6 +215,24 @@ class Board
         }
     }
 
+    public void CheckForVictory()
+    {
+        var unflaggedBombs = Spaces
+            .Where(s => s.IsBomb)
+            .Where(s => s.State != SpaceState.Flagged)
+            .Count();
+
+        var unrevealedSpaces = Spaces
+            .Where(s => !s.IsBomb)
+            .Where(s => s.State != SpaceState.Revealed)
+            .Count();
+
+        if (unflaggedBombs == 0 && unrevealedSpaces == 0)
+        {
+            State = BoardState.Victory;
+        }
+    }
+
     public void Render()
     {
         Console.SetCursorPosition(0, 0);
@@ -209,8 +250,30 @@ class Board
         var bombCount = Spaces.Count(s => s.IsBomb);
         var flagCount = Spaces.Count(s => s.State == SpaceState.Flagged);
 
-        Console.WriteLine($"\nFlags remaining: {bombCount - flagCount}");
+        Console.WriteLine($"\nFlags remaining: {bombCount - flagCount}       ");
+
+        switch (State)
+        {
+            case BoardState.Victory:
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("\nCongrats! You live to blow up another minefield.");
+                Console.ResetColor();
+                break;
+
+            case BoardState.Defeat:
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\nHave fun not having limbs anymore, sucker.");
+                Console.ResetColor();
+                break;
+        }
     }
+}
+
+enum BoardState
+{
+    InProgress,
+    Victory,
+    Defeat,
 }
 
 class Space
