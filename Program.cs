@@ -1,13 +1,38 @@
-var board = new Board(30, 20);
+using System.Text.Json;
+
+Board board = null!;
 var bombCount = 99;
 
-Console.Clear();
-Console.CursorVisible = false;
+var width = 30;
+var height = 20;
+
+var bombsPlaced = false;
+
+if (Board.HasSave())
+{
+    Console.Write("Continue save? [Y/n] ");
+    switch (Console.ReadKey(true).Key)
+    {
+        case ConsoleKey.N:
+            board = new Board(width, height);
+            break;
+
+        default:
+            board = Board.Load();
+            bombsPlaced = true;
+            break;
+    }
+}
+else
+{
+    board = new Board(width, height);
+}
 
 int x = board.Width / 2;
 int y = board.Height / 2;
 
-var bombsPlaced = false;
+Console.Clear();
+Console.CursorVisible = false;
 
 while (true)
 {
@@ -29,6 +54,7 @@ while (true)
         case ConsoleKey.Escape:
             Console.Clear();
             Console.CursorVisible = true;
+            board.Save();
             return;
 
         case ConsoleKey.K:
@@ -90,6 +116,41 @@ class Board
         for (var i = 0; i < Spaces.Length; i++)
         {
             Spaces[i] = new Space();
+        }
+    }
+
+    static string SAVE_DIRECTORY =>
+        Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            ".minesweeper"
+        );
+    static string SAVE_PATH => Path.Combine(SAVE_DIRECTORY, "save.json");
+
+    public static bool HasSave()
+    {
+        return File.Exists(SAVE_PATH);
+    }
+
+    public static Board Load()
+    {
+        return JsonSerializer.Deserialize<Board>(File.ReadAllText(SAVE_PATH))!;
+    }
+
+    public void Save()
+    {
+        if (!Directory.Exists(SAVE_DIRECTORY))
+        {
+            Directory.CreateDirectory(SAVE_DIRECTORY);
+        }
+
+        File.WriteAllText(SAVE_PATH, JsonSerializer.Serialize(this));
+    }
+
+    public static void Delete()
+    {
+        if (File.Exists(SAVE_PATH))
+        {
+            File.Delete(SAVE_PATH);
         }
     }
 
@@ -182,6 +243,7 @@ class Board
             }
 
             State = BoardState.Defeat;
+            Board.Delete();
             return;
         }
 
@@ -235,6 +297,7 @@ class Board
         if (unflaggedBombs == 0 && unrevealedSpaces == 0)
         {
             State = BoardState.Victory;
+            Board.Delete();
         }
     }
 
@@ -287,9 +350,9 @@ enum BoardState
 
 class Space
 {
-    public SpaceState State = SpaceState.Hidden;
-    public bool IsBomb = false;
-    public int Neighbors = 0;
+    public SpaceState State { get; set; } = SpaceState.Hidden;
+    public bool IsBomb { get; set; } = false;
+    public int Neighbors { get; set; } = 0;
 
     public const char EMPTY_TOKEN = ' ';
 
